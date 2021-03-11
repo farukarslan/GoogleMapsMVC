@@ -1,0 +1,60 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<br />
+@using (Html.BeginForm())
+{
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10">
+
+                @Html.DropDownList("dropdanveri", ViewBag.sehir as SelectList, "--- Şehir Seçiniz ---",
+        new { @class = "btn btn-primary dropdown-toggle" })
+
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Konumu Getir" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div id="dvMap" style="width: 1150px; height: 600px">
+</div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVmdVjwhUPUYRi0rHNnTetho1-wo2gGlk&callback=initMap"
+        type="text/javascript"></script>
+
+@*<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=API_Key"></script>*@
+<script type="text/javascript">
+    var markers = @Html.Raw(ViewBag.Markers);
+
+    @*var markers = @ViewBag.Markers;*@
+    window.onload = function () {
+        var mapOptions = {
+            center: new google.maps.LatLng(markers[0].lat, markers[0].lng),
+            zoom: 6,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var infoWindow = new google.maps.InfoWindow();
+        var map = new google.maps.Map(document.getElementById("dvMap"), mapOptions);
+        for (i = 0; i < markers.length; i++) {
+            var data = markers[i]
+            var myLatlng = new google.maps.LatLng(data.lat, data.lng);
+            var marker = new google.maps.Marker({
+                position: myLatlng,
+                map: map,
+                title: data.title
+            });
+            (function (marker, data) {
+                google.maps.event.addListener(marker, "click", function (e) {
+                    infoWindow.setContent(data.description);
+                    infoWindow.open(map, marker);
+                });
+            })(marker, data);
+        }
+    }
+</script>
+
+
